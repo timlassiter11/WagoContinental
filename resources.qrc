@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>Continental.png</file>
+        <file>redOff.png</file>
+        <file>redOff_small.png</file>
+        <file>redOn.png</file>
+        <file>redOn_small.png</file>
+        <file>blueOff.png</file>
+        <file>blueOn.png</file>
+        <file>greenOff.png</file>
+        <file>greenOn.png</file>
+    </qresource>
+</RCC>
