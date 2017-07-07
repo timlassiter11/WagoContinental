@@ -55,7 +55,6 @@ private slots:
     void                    writeData(QModbusDataUnit writeUnit, int address);
     void                    readyRead();
     void                    toggleFullscreen();
-
 };
 
 #endif // MAINWINDOW_H

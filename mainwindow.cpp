@@ -126,6 +126,8 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
     if (!mpModbusClient->connectDevice()) qDebug()<<mpModbusClient->errorString();
     
     //Sets up F11 to switch between fullscreen and windowed.
+    //This will not work on the PI as the program bypasses the window manager.
+    //To close the program, click the Continental logo.
     QShortcut *pFullscreenShortcut = new QShortcut(QKeySequence("F11"), this);
     connect(pFullscreenShortcut, &QShortcut::activated, this, &MainWindow::toggleFullscreen);
 

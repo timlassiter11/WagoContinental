@@ -318,16 +318,6 @@ padding-right: 25px;</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="4" rowspan="2" colspan="2">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="resources.qrc">:/images/Continental.png</pixmap>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="1">
      <widget class="QLabel" name="yAxis_label">
       <property name="sizePolicy">
@@ -554,6 +544,29 @@ padding-right: 30px;</string>
       </property>
      </layout>
     </item>
+    <item row="0" column="4" colspan="2">
+     <widget class="QPushButton" name="continental_button">
+      <property name="styleSheet">
+       <string notr="true">border: none;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/Continental.png</normaloff>:/images/Continental.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>800</width>
+        <height>108</height>
+       </size>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -570,5 +583,22 @@ padding-right: 30px;</string>
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>continental_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>843</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>627</x>
+     <y>398</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
