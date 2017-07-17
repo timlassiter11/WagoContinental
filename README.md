@@ -17,6 +17,6 @@ Use -b or --second-shif. Should be the same format as First shift start time but
 #### Improper usage
 ./WagoContinental -a 300 -b 1500 192.168.1.2. Missing the leading "0" for "-a".
 
-./WagoContinental -a 1500 -b 300 192.168.1.2. "-a" should always come after "-b".
+./WagoContinental -a 1500 -b 300 192.168.1.2. First shifts time (-a) should  always come before second shifts time (-b).
 
 ./WagoContinental -a 03:00 -b 15:00 192.168.1.2. There should be no ":" seperator between minutes and hours.
