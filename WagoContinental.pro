@@ -41,3 +41,6 @@ DISTFILES +=
 
 RESOURCES += \
     resources.qrc
+
+target.path = /home/jokell
+INSTALLS += target

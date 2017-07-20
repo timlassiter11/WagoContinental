@@ -8,6 +8,8 @@
 #include <QModbusDevice>
 #include <QModbusTcpClient>
 
+QT_CHARTS_USE_NAMESPACE
+
 namespace Ui {
 class MainWindow;
 }

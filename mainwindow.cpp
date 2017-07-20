@@ -165,20 +165,20 @@ void MainWindow::resetChart()
         //Then set that many ticks (hour(s) labels)
         int hours = (mShiftStart.secsTo(mShiftEnd) / 3600);
         mpAxisX->setTickCount(hours + 1);
-        mpAxisX->setRange(mShiftStart.toSecsSinceEpoch(), mShiftEnd.toSecsSinceEpoch());
+        mpAxisX->setRange(mShiftStart.toMSecsSinceEpoch() / 1000, mShiftEnd.toMSecsSinceEpoch() / 1000);
         for (int i=1; i<hours+1; i++)
         {
             QString label;
             if (i == 1) label = "1 Hour";
             else label = QString::number(i) + " Hours";
-            mpAxisX->append(label, mShiftStart.addSecs(i * 3600).toSecsSinceEpoch());
+            mpAxisX->append(label, mShiftStart.addSecs(i * 3600).toMSecsSinceEpoch() / 1000);
         }
 
         mpAxisY->setRange(0, mShiftTarget);
-        mpTargetSeries->append(mShiftStart.toSecsSinceEpoch(), 0);
-        mpTargetSeries->append(mShiftEnd.toSecsSinceEpoch(), mShiftTarget);
-        mpCycleSeries->append(mShiftStart.toSecsSinceEpoch(), 0);
-        mpPartsSeries->append(mShiftStart.toSecsSinceEpoch(), 0);
+        mpTargetSeries->append(mShiftStart.toMSecsSinceEpoch() / 1000, 0);
+        mpTargetSeries->append(mShiftEnd.toMSecsSinceEpoch() / 1000, mShiftTarget);
+        mpCycleSeries->append(mShiftStart.toMSecsSinceEpoch() / 1000, 0);
+        mpPartsSeries->append(mShiftStart.toMSecsSinceEpoch() / 1000, 0);
     }
 }
 
@@ -314,8 +314,8 @@ void MainWindow::readyRead()
             cycleCount = unit.value(2);
             partsCount = unit.value(3);
             faults = unit.value(6);
-            mpCycleSeries->append(mCurrentTime.currentSecsSinceEpoch(), cycleCount);
-            mpPartsSeries->append(mCurrentTime.currentSecsSinceEpoch(), partsCount);
+            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, cycleCount);
+            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, partsCount);
 
             mpUi->cycleCount_label->setText(QString::number(cycleCount));
             mpUi->partsCount_label->setText(QString::number(partsCount));
@@ -356,8 +356,8 @@ void MainWindow::readyRead()
             {
                 mShiftTarget = tmp;
                 mpTargetSeries->clear();
-                mpTargetSeries->append(mShiftStart.toSecsSinceEpoch(), 0);
-                mpTargetSeries->append(mShiftEnd.toSecsSinceEpoch(), mShiftTarget);
+                mpTargetSeries->append(mShiftStart.toMSecsSinceEpoch() / 1000, 0);
+                mpTargetSeries->append(mShiftEnd.toMSecsSinceEpoch() / 1000, mShiftTarget);
                 mpAxisY->setRange(0, mShiftTarget);
             }
 
