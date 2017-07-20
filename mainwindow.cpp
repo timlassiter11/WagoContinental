@@ -136,12 +136,24 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
     connect(pUpdateTimer, &QTimer::timeout, this, &MainWindow::updateData);
     pUpdateTimer->start(updateTime);
 
+    QTimer *pActiveTargetTimer = new QTimer(this);
+    connect(pActiveTargetTimer, &QTimer::timeout, this, &MainWindow::updateActiveTarget);
+    pActiveTargetTimer->start(60000);
+
     updateData();
 }
 
 MainWindow::~MainWindow()
 {
     delete mpUi;
+}
+
+void MainWindow::updateActiveTarget()
+{
+    int minElapsed = mShiftStart.secsTo(mCurrentTime) / 60;
+    int shiftLength = mShiftStart.secsTo(mShiftEnd) / 60;
+    int partsPerMin = mShiftTarget / shiftLength;
+    mpUi->activeTarget_label->setText(QString::number(partsPerMin * minElapsed));
 }
 
 //Use this function when switching shifts to clear the chart.
@@ -314,8 +326,8 @@ void MainWindow::readyRead()
             cycleCount = unit.value(2);
             partsCount = unit.value(3);
             faults = unit.value(6);
-            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, cycleCount);
-            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, partsCount);
+            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, 500);
+            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, 3000);
 
             mpUi->cycleCount_label->setText(QString::number(cycleCount));
             mpUi->partsCount_label->setText(QString::number(partsCount));
