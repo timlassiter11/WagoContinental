@@ -48,6 +48,7 @@ private:
     int                     mShiftTarget;
 
     void                    resetChart();
+    QString                 getCurrentMessage(int faultMatrix);
 
 private slots:
     void                    updateData();

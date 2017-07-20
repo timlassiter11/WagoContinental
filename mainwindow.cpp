@@ -341,13 +341,16 @@ void MainWindow::readyRead()
             }
 
             int i=0;
+            int faultMatrix = (faults >> 8);
             //The horizontal fault lights at the bottom are in order of their bit location.
             //We can just use their index in the list to pull their status from the byte;
             foreach (FaultLight *light, mHorizontalFaults)
             {
-                light->setState(faults & (1 << (i+8)));
+                light->setState(faultMatrix & (1 << i));
                 i++;
             }
+
+            mpUi->message_label->setText(getCurrentMessage(faultMatrix));
         }
         else
         {
@@ -372,6 +375,59 @@ void MainWindow::readyRead()
     }
 
     reply->deleteLater();
+}
+
+QString MainWindow::getCurrentMessage(int faultMatrix)
+{
+    QString faultState;
+
+    switch (faultMatrix)
+    {
+    //Single Input Alarms
+    case 1:     faultState = "Power Present";                                                   break;
+    case 2:     faultState = "End of Bar";                                                      break;
+    case 4:     faultState = "Spindle Speed Fault";                                             break;
+    case 64:    faultState = "Low Air Pressure";                                                break;
+
+    //Double Input Alarms
+    case 3:     faultState = "Battery Low PLC";                                                 break;
+    case 5:     faultState = "Collet Area Door Open";                                           break;
+    case 65:    faultState = "Low Hydraullic Oil Pressure";                                     break;
+    case 6:     faultState = "Production Obtained";                                             break;
+    case 20:    faultState = "Thermal Breaker";                                                 break;
+    case 68:    faultState = "Mobile Work Piece Not Foward";                                    break;
+    case 24:    faultState = "Low Circulating Lube Oil Level";                                  break;
+    case 40:    faultState = "Overload Chip Conveyor";                                          break;
+
+    //Triple Input Alarms
+    case 19:    faultState = "Machine Encoder Failed";                                          break;
+    case 35:    faultState = "Lubricating Fault";                                               break;
+    case 69:    faultState = "Mobile Work Piece Underloader Not Back";                          break;
+    case 25:    faultState = "Low Oil Level Total Loss System";                                 break;
+    case 73:    faultState = "Feed Conveyor Not Ready";                                         break;
+    case 70:    faultState = "Splash Guard Open or Gate Machine Out of Position Collets Area";  break;
+    case 26:    faultState = "Threading Spindel Not Back";                                      break;
+    case 74:    faultState = "Spindle Converters Not Ready";                                    break;
+    case 50:    faultState = "Low Air Pressure";                                                break;
+    case 82:    faultState = "Feeder Module Not Ready";                                         break;
+    case 28:    faultState = "Low Flow Circulating Lube Oil";                                   break;
+    case 44:    faultState = "Gate Iemca out of Position";                                      break;
+    case 84:    faultState = "Overload Camshafts";                                              break;
+    case 88:    faultState = "OP DW ????? (3,4,6)";                                             break;
+
+    //Quadruple Input Alarms
+    case 43:    faultState = "Stock Carrier Gate Open";                                         break;
+    case 75:    faultState = "Bar Stop Out of Position";                                        break;
+    case 83:    faultState = "Loading Bar";                                                     break;
+    case 45:    faultState = "Converter Over Temperature";                                      break;
+    case 89:    faultState = "Emergency Stop Bar Loader";                                       break;
+    case 177:   faultState = "OP DW ????? (0,4,5,7)";                                           break;
+    case 30:    faultState = "Threading Fault";                                                 break;
+    case 172:   faultState = "Loading Bar";                                                     break;
+    default:    faultState = "No Alarms Detected";
+    }
+
+    return faultState;
 }
 
 void MainWindow::toggleFullscreen()
