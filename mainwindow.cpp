@@ -320,10 +320,8 @@ void MainWindow::readyRead()
             }
 
             int cycleCount, partsCount, faults;
-            cycleCount = 14000;
-            partsCount = 12000;
-            //cycleCount = unit.value(2);
-            //partsCount = unit.value(3);
+            cycleCount = unit.value(2);
+            partsCount = unit.value(3);
             faults = unit.value(6);
             mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, cycleCount);
             mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, partsCount);
