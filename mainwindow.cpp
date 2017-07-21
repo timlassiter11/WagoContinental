@@ -134,12 +134,8 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
     //Timer to update data from Modbus server as well as check if the new shift has started.
     QTimer *pUpdateTimer = new QTimer(this);
     connect(pUpdateTimer, &QTimer::timeout, this, &MainWindow::updateData);
+    connect(pUpdateTimer, &QTimer::timeout, this, &MainWindow::updateActiveTarget);
     pUpdateTimer->start(updateTime);
-
-    QTimer *pActiveTargetTimer = new QTimer(this);
-    connect(pActiveTargetTimer, &QTimer::timeout, this, &MainWindow::updateActiveTarget);
-    pActiveTargetTimer->start(60000);
-
     updateData();
 }
 
@@ -150,9 +146,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateActiveTarget()
 {
+    int partsPerMin = 0;
     int minElapsed = mShiftStart.secsTo(mCurrentTime) / 60;
     int shiftLength = mShiftStart.secsTo(mShiftEnd) / 60;
-    int partsPerMin = mShiftTarget / shiftLength;
+    if (shiftLength > 0) partsPerMin = mShiftTarget / shiftLength;
     mpUi->activeTarget_label->setText(QString::number(partsPerMin * minElapsed));
 }
 
@@ -323,11 +320,13 @@ void MainWindow::readyRead()
             }
 
             int cycleCount, partsCount, faults;
-            cycleCount = unit.value(2);
-            partsCount = unit.value(3);
+            cycleCount = 14000;
+            partsCount = 12000;
+            //cycleCount = unit.value(2);
+            //partsCount = unit.value(3);
             faults = unit.value(6);
-            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, 500);
-            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, 3000);
+            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, cycleCount);
+            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, partsCount);
 
             mpUi->cycleCount_label->setText(QString::number(cycleCount));
             mpUi->partsCount_label->setText(QString::number(partsCount));
