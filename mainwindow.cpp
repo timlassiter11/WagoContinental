@@ -116,6 +116,7 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
     pFillSeries->attachAxis(mpAxisY);
     mpUi->chartView->setRenderHint(QPainter::Antialiasing);
 
+
     //Initialize modbus connection
     connect(mpModbusClient, &QModbusTcpClient::errorOccurred, this, &MainWindow::modbusError);
     connect(mpModbusClient, &QModbusTcpClient::stateChanged, this, &MainWindow::modbusStateChanged);
@@ -323,8 +324,8 @@ void MainWindow::readyRead()
             cycleCount = unit.value(2);
             partsCount = unit.value(3);
             faults = unit.value(6);
-            mpCycleSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, cycleCount);
-            mpPartsSeries->append(mCurrentTime.currentMSecsSinceEpoch() / 1000, partsCount);
+            mpCycleSeries->append(mCurrentTime.toMSecsSinceEpoch() / 1000, cycleCount);
+            mpPartsSeries->append(mCurrentTime.toMSecsSinceEpoch() / 1000, partsCount);
 
             mpUi->cycleCount_label->setText(QString::number(cycleCount));
             mpUi->partsCount_label->setText(QString::number(partsCount));
