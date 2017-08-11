@@ -52,7 +52,6 @@ private:
 
 private slots:
     void                    updateData();
-    void                    updateActiveTarget();
     void                    modbusError(QModbusDevice::Error error);
     void                    modbusStateChanged(QModbusTcpClient::State state);
     void                    readData(QModbusDataUnit readUnit, int address);

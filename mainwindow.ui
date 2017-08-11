@@ -95,7 +95,7 @@ border: 1px solid black;
 padding: 20px;</string>
       </property>
       <property name="text">
-       <string>WAGO_GM12 (51)</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

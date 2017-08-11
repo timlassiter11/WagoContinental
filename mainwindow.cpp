@@ -135,7 +135,6 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
     //Timer to update data from Modbus server as well as check if the new shift has started.
     QTimer *pUpdateTimer = new QTimer(this);
     connect(pUpdateTimer, &QTimer::timeout, this, &MainWindow::updateData);
-    connect(pUpdateTimer, &QTimer::timeout, this, &MainWindow::updateActiveTarget);
     pUpdateTimer->start(updateTime);
     updateData();
 }
@@ -143,15 +142,6 @@ MainWindow::MainWindow(QTime firstShift, QTime secondShift, QString addr, QWidge
 MainWindow::~MainWindow()
 {
     delete mpUi;
-}
-
-void MainWindow::updateActiveTarget()
-{
-    int partsPerMin = 0;
-    int minElapsed = mShiftStart.secsTo(mCurrentTime) / 60;
-    int shiftLength = mShiftStart.secsTo(mShiftEnd) / 60;
-    if (shiftLength > 0) partsPerMin = mShiftTarget / shiftLength;
-    mpUi->activeTarget_label->setText(QString::number(partsPerMin * minElapsed));
 }
 
 //Use this function when switching shifts to clear the chart.
@@ -220,12 +210,11 @@ void MainWindow::updateData()
     else if (mpModbusClient->state() == QModbusDevice::ConnectedState)
     {
         //Read only registers
-        QModbusDataUnit unit1(QModbusDataUnit::InputRegisters, 0, 13);
+        QModbusDataUnit unit1(QModbusDataUnit::InputRegisters, 0, 14);
         readData(unit1, 1);
 
-        //Read write registers
-        QModbusDataUnit unit3(QModbusDataUnit::HoldingRegisters, 32000, 1);
-        readData(unit3, 1);
+        QModbusDataUnit unit2(QModbusDataUnit::InputRegisters, 20, 3);
+        readData(unit2, 1);
     }
 }
 
@@ -286,6 +275,9 @@ void MainWindow::readyRead()
             quint64 word3 = unit.value(11);
             quint64 epochTime = word0 | (word1 << 16) | (word2 << 32) | (word3 << 48);
             mCurrentTime.setMSecsSinceEpoch(epochTime);
+
+
+            mpUi->nameLabel->setText("WAGO_GM"+QString::number(unit.value(12)));
 
             //If the time from the PLC is valid and the shift times aren't we should set them.
             //This should only happen on the first modbus read. (before the PI knows the time)
@@ -361,6 +353,13 @@ void MainWindow::readyRead()
             }
 
             mpUi->message_label->setText(getCurrentMessage(faultMatrix));
+        }
+        else if (unit.startAddress() == 20)
+        {
+            int activeTarget = unit.value(0);
+            int machineId = unit.value(1);
+            mpUi->activeTarget_label->setText(QString::number(activeTarget));
+            mpUi->nameLabel->setText("WAGO_GM" + QString("%1").arg(machineId, 2, 10, QChar('0')));
         }
         else
         {
