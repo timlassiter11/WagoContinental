@@ -209,11 +209,12 @@ void MainWindow::updateData()
         mpModbusClient->connectDevice();
     else if (mpModbusClient->state() == QModbusDevice::ConnectedState)
     {
-        //Read only registers
+        //Modbus variables are stored in two different sections.
+        //Check out "readyRead()" to see where everything is stored.
         QModbusDataUnit unit1(QModbusDataUnit::InputRegisters, 0, 14);
         readData(unit1, 1);
 
-        QModbusDataUnit unit2(QModbusDataUnit::InputRegisters, 20, 3);
+        QModbusDataUnit unit2(QModbusDataUnit::InputRegisters, 20, 4);
         readData(unit2, 1);
     }
 }
@@ -269,15 +270,14 @@ void MainWindow::readyRead()
         const QModbusDataUnit unit = reply->result();
         if (unit.startAddress() == 0)
         {
+            //Epoch time is stored across 4 registers
             quint64 word0 = unit.value(8);
             quint64 word1 = unit.value(9);
             quint64 word2 = unit.value(10);
             quint64 word3 = unit.value(11);
+            //We need to combine all these registers to get our actual value
             quint64 epochTime = word0 | (word1 << 16) | (word2 << 32) | (word3 << 48);
             mCurrentTime.setMSecsSinceEpoch(epochTime);
-
-
-            mpUi->nameLabel->setText("WAGO_GM"+QString::number(unit.value(12)));
 
             //If the time from the PLC is valid and the shift times aren't we should set them.
             //This should only happen on the first modbus read. (before the PI knows the time)
@@ -313,15 +313,19 @@ void MainWindow::readyRead()
             }
 
             int cycleCount, partsCount, faults;
-            cycleCount = unit.value(2);
-            partsCount = unit.value(3);
-            faults = unit.value(6);
+            cycleCount =    unit.value(2);
+            partsCount =    unit.value(3);
+            faults =        unit.value(6);
+
+            //Add our values to their respective data series
             mpCycleSeries->append(mCurrentTime.toMSecsSinceEpoch() / 1000, cycleCount);
             mpPartsSeries->append(mCurrentTime.toMSecsSinceEpoch() / 1000, partsCount);
 
+            //Update the text with the new values
             mpUi->cycleCount_label->setText(QString::number(cycleCount));
             mpUi->partsCount_label->setText(QString::number(partsCount));
 
+            //Updated the current time.
             QString curDateTimeString = mCurrentTime.toString("MMM dd, yyyy hh:mm");
             mpUi->statusBar->showMessage("Last update: " + curDateTimeString);
             mpUi->statusBar->setStyleSheet("color: black;");
@@ -352,27 +356,25 @@ void MainWindow::readyRead()
                 i++;
             }
 
+            //Update the current error message
             mpUi->message_label->setText(getCurrentMessage(faultMatrix));
         }
         else if (unit.startAddress() == 20)
         {
             int activeTarget = unit.value(0);
             int machineId = unit.value(1);
-            mpUi->activeTarget_label->setText(QString::number(activeTarget));
+            int shiftTarget = unit.value(3);
+            mpUi->activeTarget_label->setText(QString::number(activeTarget));            
             mpUi->nameLabel->setText("WAGO_GM" + QString("%1").arg(machineId, 2, 10, QChar('0')));
-        }
-        else
-        {
-            int tmp = unit.value(0);
-            if (tmp != 0 && tmp != mShiftTarget)
-            {
-                mShiftTarget = tmp;
-                mpTargetSeries->clear();
-                mpTargetSeries->append(mShiftStart.toMSecsSinceEpoch() / 1000, 0);
-                mpTargetSeries->append(mShiftEnd.toMSecsSinceEpoch() / 1000, mShiftTarget);
-                mpAxisY->setRange(0, mShiftTarget);
-            }
 
+
+            //If the new shift target isn't the same we need to update the shift target and reset the chart.
+            if (shiftTarget != mShiftTarget)
+            {
+                mShiftTarget = shiftTarget;
+                mpUi->shiftTarget_label->setText(QString::number(shiftTarget));
+                resetChart();
+            }
         }
     }
     else
